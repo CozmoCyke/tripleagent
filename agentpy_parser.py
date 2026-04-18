@@ -569,9 +569,12 @@ class ACSParser(object):
             (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), 16
         )
     def parse_rgbquad(self, offset):
-        red = self.parse_byte(offset)
+        # Windows RGBQUAD / DIB palette entries are stored in B, G, R, reserved order.
+        # We normalize them here so the rest of the renderer can treat .red/.green/.blue
+        # as canonical RGB values.
+        blue = self.parse_byte(offset)
         green = self.parse_byte(offset + 1)
-        blue = self.parse_byte(offset + 2)
+        red = self.parse_byte(offset + 2)
         reserved = self.parse_byte(offset + 3)
         int_ = (red * 0x10000) + (green * 0x100) + blue
         hex_ = hex(red)[2:].zfill(2)+hex(green)[2:].zfill(2)+hex(blue)[2:].zfill(2)
